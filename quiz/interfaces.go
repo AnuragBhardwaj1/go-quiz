@@ -2,8 +2,9 @@ package quiz
 
 type QuestionService interface {
     Next() *Question
+    CloseConnection() error
 }
 
 type ReaderService interface {
-    Read(terminater byte) (string, error)
+    Read() (string, error)
 }

@@ -4,13 +4,14 @@ import (
     "bufio"
 )
 
+const Terminator =  '\n'
+
 type inputService struct {
     reader *bufio.Reader
 }
 
-func (i inputService) Read(terminator byte) (string, error) {
-    //panic("implement me")
-    return  i.reader.ReadString(terminator)
+func (i inputService) Read() (string, error) {
+    return  i.reader.ReadString(Terminator)
 
 }
 

@@ -13,6 +13,10 @@ type questionService struct {
     file   *os.File
 }
 
+func (this *questionService) CloseConnection() error {
+    return this.file.Close()
+}
+
 func NewQuestionService() *questionService {
     return &questionService{}
 }
@@ -29,11 +33,12 @@ func (this *questionService) Next() *quiz.Question {
     return quiz.NewQuestion(record[0], record[1])
 }
 
-func (this *questionService) WithReader(fileName string) {
+func (this *questionService) WithReader(fileName string) (*questionService, error) {
     file, err := os.Open(fileName)
     if err != nil {
-        return
+        return this , err
     }
     this.file = file
     this.buffer = csv.NewReader(file)
+    return this, nil
 }

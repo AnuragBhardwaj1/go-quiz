@@ -1,22 +1,30 @@
 package main
 
 import (
-    "bufio"
-    "gopher-quiz/quiz"
-    "gopher-quiz/services"
-    "os"
+	"bufio"
+	"fmt"
+	"gopher-quiz/quiz"
+	"gopher-quiz/services"
+	"os"
 )
 
 func main() {
-    startQuiz()
+	startQuiz()
 }
 
-func startQuiz()()  {
-    questionService := services.NewQuestionService()
-    questionService.WithReader("problems.csv")
-    reader := bufio.NewReader(os.Stdin)
-    inputReader := services.NewInputService(reader)
+const FileName = "problems.csv"
 
-    quiz := quiz.NewQuiz(questionService, inputReader)
-    quiz.Begin()
+func startQuiz() {
+	questionService, err := services.NewQuestionService().WithReader(FileName)
+
+	if err != nil {
+		fmt.Println("error in loading file")
+		fmt.Println("--- exiting ---")
+		return
+	}
+	reader := bufio.NewReader(os.Stdin)
+	inputReader := services.NewInputService(reader)
+
+	quiz := quiz.NewQuiz(questionService, inputReader)
+	quiz.Begin()
 }

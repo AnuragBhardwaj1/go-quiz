@@ -17,9 +17,16 @@ func (q *quiz) Begin() {
     for {
         currentQuestion = q.questionService.Next()
         if currentQuestion == nil {
+            q.questionService.CloseConnection()
             break
         }
         q.askQuestions(currentQuestion)
+        submittedAnswer := q.promptForAnswer()
+        if q.isInterrupted(submittedAnswer) {
+            break
+        }
+        q.processSubmittedAnswer(currentQuestion, submittedAnswer)
+
     }
     q.evaluateAnswers()
     q.displayResults()
@@ -30,19 +37,6 @@ func (q *quiz) askQuestions(currentQuestion *Question) {
     q.addQuestion(currentQuestion)
     problemStatement := fmt.Sprintf("what is %s ?", currentQuestion.problemStatement)
     fmt.Println(problemStatement)
-
-    submittedAnswer, err := q.inputReader.Read('\n')
-    if err != nil {
-        return
-    }
-    if q.isInterrupted(submittedAnswer) {
-        return
-    }
-    submittedAnswer = strings.TrimSpace(submittedAnswer)
-    currentQuestion.submittedAnswer = submittedAnswer
-    if currentQuestion.submittedAnswer != "" && currentQuestion.correctAnswer != "" {
-        currentQuestion.answered = true
-    }
 }
 
 func (q *quiz) addQuestion(currentQuestion *Question) {
@@ -67,6 +61,23 @@ func (q *quiz) displayResults() {
 
 func (q *quiz) isInterrupted(answer string) bool {
     return answer == "quit" || answer == "" || answer == "exit" || answer == "q"
+}
+
+func (q *quiz) promptForAnswer() string {
+    //Todo: move terminator from here to reader
+    submittedAnswer, err := q.inputReader.Read()
+    if err != nil {
+        return ""
+    }
+    submittedAnswer = strings.TrimSpace(submittedAnswer)
+    return submittedAnswer
+}
+
+func (q *quiz) processSubmittedAnswer(currentQuestion *Question, submittedAnswer string) {
+    currentQuestion.submittedAnswer = submittedAnswer
+    if currentQuestion.submittedAnswer != "" && currentQuestion.correctAnswer != "" {
+        currentQuestion.answered = true
+    }
 }
 
 func NewQuiz(questionService QuestionService, inputReader ReaderService) *quiz {
