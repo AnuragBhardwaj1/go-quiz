@@ -31,12 +31,15 @@ func (q *quiz) askQuestions(currentQuestion *Question) {
     problemStatement := fmt.Sprintf("what is %s ?", currentQuestion.problemStatement)
     fmt.Println(problemStatement)
 
-    anticipatedAnswer, err := q.inputReader.Read('\n')
+    submittedAnswer, err := q.inputReader.Read('\n')
     if err != nil {
         return
     }
-    anticipatedAnswer = strings.TrimSpace(anticipatedAnswer)
-    currentQuestion.submittedAnswer = anticipatedAnswer
+    if q.isInterrupted(submittedAnswer) {
+        return
+    }
+    submittedAnswer = strings.TrimSpace(submittedAnswer)
+    currentQuestion.submittedAnswer = submittedAnswer
     if currentQuestion.submittedAnswer != "" && currentQuestion.correctAnswer != "" {
         currentQuestion.answered = true
     }
@@ -60,6 +63,10 @@ func (q *quiz) incrementScore() {
 
 func (q *quiz) displayResults() {
     fmt.Println("your score is:", q.score)
+}
+
+func (q *quiz) isInterrupted(answer string) bool {
+    return answer == "quit" || answer == "" || answer == "exit" || answer == "q"
 }
 
 func NewQuiz(questionService QuestionService, inputReader ReaderService) *quiz {
