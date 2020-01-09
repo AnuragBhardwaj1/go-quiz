@@ -1,5 +1,9 @@
 package quiz
 
 type QuestionService interface {
-    Next()
+    Next() *Question
+}
+
+type ReaderService interface {
+    Read(terminater byte) (string, error)
 }
