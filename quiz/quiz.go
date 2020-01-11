@@ -64,7 +64,6 @@ func (q *quiz) isInterrupted(answer string) bool {
 }
 
 func (q *quiz) promptForAnswer() string {
-    //Todo: move terminator from here to reader
     submittedAnswer, err := q.inputReader.Read()
     if err != nil {
         return ""
